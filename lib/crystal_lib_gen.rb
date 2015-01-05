@@ -108,17 +108,24 @@ class FFIGen
 
   class Name
     CRYSTAL_KEYWORDS = %w{alias and begin break case class def defined do else elsif end ensure false for if in module next nil not or redo rescue retry return self super then true undef unless until when while yield BEGIN END}
-
+    
     def to_crystal_downcase
+      fix_empty_prefix
       format :downcase, :underscores, CRYSTAL_KEYWORDS
     end
 
     def to_crystal_classname
+      fix_empty_prefix
       format :camelcase, CRYSTAL_KEYWORDS
     end
 
     def to_crystal_constant
+      fix_empty_prefix
       format :upcase, :underscores, CRYSTAL_KEYWORDS
+    end
+
+    def fix_empty_prefix
+      @parts = @raw.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?) if @parts.empty?
     end
   end
 
@@ -170,12 +177,16 @@ class FFIGen
                end
         "#{name} : #{type}"
       end
-    
-      writer.puts "fun #{crystal_name}(#{params.join(', ')}) : #{@generator.to_crystal_type @return_type}"
+      
+      writer.puts "fun #{crystal_name} = \"#{raw_name}\"(#{params.join(', ')}) : #{@generator.to_crystal_type @return_type}"
     end
 
     def crystal_name
       @crystal_name ||= @name.to_crystal_downcase
+    end
+
+    def raw_name
+      @raw_name ||= @name.raw
     end
   end
 

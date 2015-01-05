@@ -7,6 +7,6 @@ FFIGen.generate(
                 mruby/compile.h               
                ],
   cflags:      ['-I/usr/local/opt/mruby/include/'],
-  prefixes:    [],
+  prefixes:    ["mrb", "mrbc"],
   output:      "out/mruby.cr"
 )

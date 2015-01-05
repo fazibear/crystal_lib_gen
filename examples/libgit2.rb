@@ -8,6 +8,6 @@ FFIGen.generate(
                 git2/status.h
                ],
   cflags:      ['-I/usr/local/opt/libgit2/include/'],
-  prefixes:    [],
+  prefixes:    ["git"],
   output:      "out/git2.cr"
 )

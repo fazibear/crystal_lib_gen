@@ -1,6 +1,6 @@
 require "./mruby"
 
-mrb = MRuby.mrb_open
+mrb = MRuby.open
 
 code = %{
  p "hello world from mruby!"
@@ -9,4 +9,4 @@ code = %{
  end
 }
 
-MRuby.mrb_load_string(mrb, code)
+MRuby.load_string(mrb, code)

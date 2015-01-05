@@ -11,7 +11,7 @@ lib MRuby
   STR_FUNC_HEREDOC = 0x40
   STR_FUNC_XQUOTE = 0x80
   MRB_PARSER_BUF_SIZE = 1024
-  enum MrbFiberState
+  enum FiberState
     MRBFIBERCREATED = 0
     MRBFIBERRUNNING = 1
     MRBFIBERRESUMED = 2
@@ -31,7 +31,7 @@ lib MRuby
     CALLTYPEMAX = 3
   end
   
-  enum MrbLexStateEnum
+  enum LexStateEnum
     EXPRBEG = 0
     EXPREND = 1
     EXPRENDARG = 2
@@ -46,10 +46,10 @@ lib MRuby
     EXPRMAXSTATE = 11
   end
   
-  enum MrbStringType
+  enum StringType
   end
   
-  struct MrbIrep
+  struct Irep
   end
   
   struct RProc
@@ -58,10 +58,10 @@ lib MRuby
   struct REnv
   end
   
-  struct MrbCallinfo
+  struct Callinfo
   end
   
-  struct MrbContext
+  struct Context
   end
   
   struct HeapPage
@@ -73,10 +73,10 @@ lib MRuby
   struct KhN2s
   end
   
-  struct MrbState
+  struct State
   end
   
-  struct MrbPool
+  struct Pool
   end
   
   struct KhMt
@@ -85,22 +85,22 @@ lib MRuby
   struct RClass
   end
   
-  struct MrbcContext
+  struct CContext
   end
   
-  struct MrbAstNode
+  struct AstNode
   end
   
-  struct MrbParserMessage
+  struct ParserMessage
   end
   
-  struct MrbParserHeredocInfo
+  struct ParserHeredocInfo
   end
   
-  struct MrbParserState
+  struct ParserState
   end
   
-  struct MrbIrep
+  struct Irep
   end
   
   struct RProc
@@ -109,7 +109,7 @@ lib MRuby
   struct REnv
   end
   
-  struct MrbCallinfo
+  struct Callinfo
     mid: Int16
     proc: RProc*
     stackidx: Int16
@@ -124,19 +124,19 @@ lib MRuby
     env: REnv*
   end
   
-  struct MrbContext
-    prev: MrbContext*
+  struct Context
+    prev: Context*
     stack: Void*
     stbase: Void*
     stend: Void*
-    ci: MrbCallinfo*
-    cibase: MrbCallinfo*
-    ciend: MrbCallinfo*
+    ci: Callinfo*
+    cibase: Callinfo*
+    ciend: Callinfo*
     rescue_: Void**
     rsize: Int16
     ensure_: RProc**
     esize: Int16
-    status: MrbFiberState
+    status: FiberState
     fib: Void*
   end
   
@@ -149,11 +149,11 @@ lib MRuby
   struct KhN2s
   end
   
-  struct MrbState
+  struct State
     jmp: Void*
     allocf: Void*
-    c: MrbContext*
-    root_c: MrbContext*
+    c: Context*
+    root_c: Context*
     exc: Void*
     globals: Void*
     top_self: Void*
@@ -199,7 +199,7 @@ lib MRuby
     ud: Void*
   end
   
-  struct MrbPool
+  struct Pool
   end
   
   struct KhMt
@@ -216,7 +216,7 @@ lib MRuby
     super_: RClass*
   end
   
-  struct MrbcContext
+  struct CContext
     syms: Void*
     slen: Int16
     filename: UInt8*
@@ -229,41 +229,41 @@ lib MRuby
     no_exec: UInt8
   end
   
-  struct MrbAstNode
-    car: MrbAstNode*
-    cdr: MrbAstNode*
+  struct AstNode
+    car: AstNode*
+    cdr: AstNode*
     lineno: UInt16
     filename_index: UInt16
   end
   
-  struct MrbParserMessage
+  struct ParserMessage
     lineno: Int16
     column: Int16
     message: UInt8*
   end
   
-  struct MrbParserHeredocInfo
+  struct ParserHeredocInfo
     allow_indent: UInt8
     line_head: UInt8
-    type: MrbStringType
+    type: StringType
     term: UInt8*
     term_len: Int16
-    doc: MrbAstNode*
+    doc: AstNode*
   end
   
-  struct MrbParserState
-    mrb: MrbState*
-    pool: MrbPool*
-    cells: MrbAstNode*
+  struct ParserState
+    mrb: State*
+    pool: Pool*
+    cells: AstNode*
     s: UInt8*
     send: UInt8*
     f: Void*
-    cxt: MrbcContext*
+    cxt: CContext*
     filename: UInt8*
     lineno: Int16
     column: Int16
-    lstate: MrbLexStateEnum
-    lex_strterm: MrbAstNode*
+    lstate: LexStateEnum
+    lex_strterm: AstNode*
     cond_stack: UInt16
     cmdarg_stack: UInt16
     paren_nest: Int16
@@ -271,171 +271,171 @@ lib MRuby
     in_def: Int16
     in_single: Int16
     cmd_start: Int16
-    locals: MrbAstNode*
-    pb: MrbAstNode*
+    locals: AstNode*
+    pb: AstNode*
     buf: StaticArray(UInt8, 1024)
     bidx: Int16
-    all_heredocs: MrbAstNode*
-    heredocs_from_nextline: MrbAstNode*
-    parsing_heredoc: MrbAstNode*
-    lex_strterm_before_heredoc: MrbAstNode*
+    all_heredocs: AstNode*
+    heredocs_from_nextline: AstNode*
+    parsing_heredoc: AstNode*
+    lex_strterm_before_heredoc: AstNode*
     heredoc_end_now: UInt8
     ylval: Void*
     nerr: UInt32
     nwarn: UInt32
-    tree: MrbAstNode*
+    tree: AstNode*
     capture_errors: Int16
-    error_buffer: StaticArray(MrbParserMessage, 10)
-    warn_buffer: StaticArray(MrbParserMessage, 10)
+    error_buffer: StaticArray(ParserMessage, 10)
+    warn_buffer: StaticArray(ParserMessage, 10)
     filename_table: Void*
     filename_table_length: UInt32
     current_filename_index: Int16
     jmp: StaticArray(Int16, 37)
   end
   
-  fun mrb_allocf(void : Void*, uint32 : UInt32, ud : Void*) : MrbState*
-  fun mrb_func_t(mrb : MrbState*, int32 : Int32) : Int32
-  fun mrb_define_class(mrbstate : MrbState*, uint8 : UInt8*, rclass : RClass*) : RClass*
-  fun mrb_define_module(mrbstate : MrbState*, uint8 : UInt8*) : RClass*
-  fun mrb_singleton_class(mrbstate : MrbState*, int32 : Int32) : Int32
-  fun mrb_include_module(mrbstate : MrbState*, rclass : RClass*, rclass : RClass*) : Void
-  fun mrb_define_method(mrbstate : MrbState*, rclass : RClass*, uint8 : UInt8*, void : Void*, uint16 : UInt16) : Void
-  fun mrb_define_class_method(mrbstate : MrbState*, rclass : RClass*, uint8 : UInt8*, void : Void*, uint16 : UInt16) : Void
-  fun mrb_define_singleton_method(mrbstate : MrbState*, void : Void*, uint8 : UInt8*, void : Void*, uint16 : UInt16) : Void
-  fun mrb_define_module_function(mrbstate : MrbState*, rclass : RClass*, uint8 : UInt8*, void : Void*, uint16 : UInt16) : Void
-  fun mrb_define_const(mrbstate : MrbState*, rclass : RClass*, name : UInt8*, int32 : Int32) : Void
-  fun mrb_undef_method(mrbstate : MrbState*, rclass : RClass*, uint8 : UInt8*) : Void
-  fun mrb_undef_class_method(mrbstate : MrbState*, rclass : RClass*, uint8 : UInt8*) : Void
-  fun mrb_obj_new(mrb : MrbState*, c : RClass*, argc : Int16, argv : Void*) : Int32
-  fun mrb_instance_new(mrb : MrbState*, cv : Int32) : Int32
-  fun mrb_class_new(mrb : MrbState*, super_ : RClass*) : RClass*
-  fun mrb_module_new(mrb : MrbState*) : RClass*
-  fun mrb_class_defined(mrb : MrbState*, name : UInt8*) : UInt8
-  fun mrb_class_get(mrb : MrbState*, name : UInt8*) : RClass*
-  fun mrb_class_get_under(mrb : MrbState*, outer : RClass*, name : UInt8*) : RClass*
-  fun mrb_obj_dup(mrb : MrbState*, obj : Int32) : Int32
-  fun mrb_check_to_integer(mrb : MrbState*, val : Int32, method : UInt8*) : Int32
-  fun mrb_obj_respond_to(mrb : MrbState*, c : RClass*, mid : Int16) : UInt8
-  fun mrb_define_class_under(mrb : MrbState*, outer : RClass*, name : UInt8*, super_ : RClass*) : RClass*
-  fun mrb_define_module_under(mrb : MrbState*, outer : RClass*, name : UInt8*) : RClass*
-  fun mrb_get_args(mrb : MrbState*, format : UInt8*) : Int16
-  fun mrb_funcall(mrbstate : MrbState*, int32 : Int32, uint8 : UInt8*, int16 : Int16) : Int32
-  fun mrb_funcall_argv(mrbstate : MrbState*, int32 : Int32, int16 : Int16, int16 : Int16, void : Void*) : Int32
-  fun mrb_funcall_with_block(mrbstate : MrbState*, int32 : Int32, int16 : Int16, int16 : Int16, void : Void*, int32 : Int32) : Int32
-  fun mrb_intern_cstr(mrbstate : MrbState*, uint8 : UInt8*) : Int16
-  fun mrb_intern(mrbstate : MrbState*, uint8 : UInt8*, uint32 : UInt32) : Int16
-  fun mrb_intern_static(mrbstate : MrbState*, uint8 : UInt8*, uint32 : UInt32) : Int16
-  fun mrb_intern_str(mrbstate : MrbState*, int32 : Int32) : Int16
-  fun mrb_check_intern_cstr(mrbstate : MrbState*, uint8 : UInt8*) : Int32
-  fun mrb_check_intern(mrbstate : MrbState*, uint8 : UInt8*, uint32 : UInt32) : Int32
-  fun mrb_check_intern_str(mrbstate : MrbState*, int32 : Int32) : Int32
-  fun mrb_sym2name(mrbstate : MrbState*, int16 : Int16) : UInt8*
-  fun mrb_sym2name_len(mrbstate : MrbState*, int16 : Int16, void : Void*) : UInt8*
-  fun mrb_sym2str(mrbstate : MrbState*, int16 : Int16) : Int32
-  fun mrb_str_format(mrbstate : MrbState*, int16 : Int16, void : Void*, int32 : Int32) : Int32
-  fun mrb_malloc(mrbstate : MrbState*, uint32 : UInt32) : Void*
-  fun mrb_calloc(mrbstate : MrbState*, uint32 : UInt32, uint32 : UInt32) : Void*
-  fun mrb_realloc(mrbstate : MrbState*, void : Void*, uint32 : UInt32) : Void*
-  fun mrb_realloc_simple(mrbstate : MrbState*, void : Void*, uint32 : UInt32) : Void*
-  fun mrb_malloc_simple(mrbstate : MrbState*, uint32 : UInt32) : Void*
-  fun mrb_obj_alloc(mrbstate : MrbState*, int32 : Int32, rclass : RClass*) : Void*
-  fun mrb_free(mrbstate : MrbState*, void : Void*) : Void
-  fun mrb_str_new(mrb : MrbState*, p : UInt8*, len : UInt32) : Int32
-  fun mrb_str_new_cstr(mrbstate : MrbState*, uint8 : UInt8*) : Int32
-  fun mrb_str_new_static(mrb : MrbState*, p : UInt8*, len : UInt32) : Int32
-  fun mrb_open() : MrbState*
-  fun mrb_open_allocf(void : Void*, ud : Void*) : MrbState*
-  fun mrb_close(mrbstate : MrbState*) : Void
-  fun mrb_top_self(mrbstate : MrbState*) : Int32
-  fun mrb_run(mrbstate : MrbState*, rproc : RProc*, int32 : Int32) : Int32
-  fun mrb_context_run(mrbstate : MrbState*, rproc : RProc*, int32 : Int32, uint16 : UInt16) : Int32
-  fun mrb_p(mrbstate : MrbState*, int32 : Int32) : Void
-  fun mrb_obj_id(obj : Int32) : Int16
-  fun mrb_obj_to_sym(mrb : MrbState*, name : Int32) : Int16
-  fun mrb_obj_eq(mrbstate : MrbState*, int32 : Int32, int32 : Int32) : UInt8
-  fun mrb_obj_equal(mrbstate : MrbState*, int32 : Int32, int32 : Int32) : UInt8
-  fun mrb_equal(mrb : MrbState*, obj1 : Int32, obj2 : Int32) : UInt8
-  fun mrb_integer(mrb : MrbState*, val : Int32) : Int32
-  fun mrb_float(mrb : MrbState*, val : Int32) : Int32
-  fun mrb_inspect(mrb : MrbState*, obj : Int32) : Int32
-  fun mrb_eql(mrb : MrbState*, obj1 : Int32, obj2 : Int32) : UInt8
-  fun mrb_garbage_collect(mrbstate : MrbState*) : Void
-  fun mrb_full_gc(mrbstate : MrbState*) : Void
-  fun mrb_incremental_gc(mrbstate : MrbState*) : Void
-  fun mrb_gc_arena_save(mrbstate : MrbState*) : Int16
-  fun mrb_gc_arena_restore(mrbstate : MrbState*, int16 : Int16) : Void
-  fun mrb_gc_mark(mrbstate : MrbState*, void : Void*) : Void
-  fun mrb_field_write_barrier(mrbstate : MrbState*, void : Void*, void : Void*) : Void
-  fun mrb_write_barrier(mrbstate : MrbState*, void : Void*) : Void
-  fun mrb_check_convert_type(mrb : MrbState*, val : Int32, type : Int32, tname : UInt8*, method : UInt8*) : Int32
-  fun mrb_any_to_s(mrb : MrbState*, obj : Int32) : Int32
-  fun mrb_obj_classname(mrb : MrbState*, obj : Int32) : UInt8*
-  fun mrb_obj_class(mrb : MrbState*, obj : Int32) : RClass*
-  fun mrb_class_path(mrb : MrbState*, c : RClass*) : Int32
-  fun mrb_convert_type(mrb : MrbState*, val : Int32, type : Int32, tname : UInt8*, method : UInt8*) : Int32
-  fun mrb_obj_is_kind_of(mrb : MrbState*, obj : Int32, c : RClass*) : UInt8
-  fun mrb_obj_inspect(mrb : MrbState*, self_ : Int32) : Int32
-  fun mrb_obj_clone(mrb : MrbState*, self_ : Int32) : Int32
-  fun mrb_exc_new(mrb : MrbState*, c : RClass*, ptr : UInt8*, len : Int32) : Int32
-  fun mrb_exc_raise(mrb : MrbState*, exc : Int32) : Void
-  fun mrb_raise(mrb : MrbState*, c : RClass*, msg : UInt8*) : Void
-  fun mrb_raisef(mrb : MrbState*, c : RClass*, fmt : UInt8*) : Void
-  fun mrb_name_error(mrb : MrbState*, id : Int16, fmt : UInt8*) : Void
-  fun mrb_warn(mrb : MrbState*, fmt : UInt8*) : Void
-  fun mrb_bug(mrb : MrbState*, fmt : UInt8*) : Void
-  fun mrb_print_backtrace(mrb : MrbState*) : Void
-  fun mrb_print_error(mrb : MrbState*) : Void
-  fun mrb_yield(mrb : MrbState*, b : Int32, arg : Int32) : Int32
-  fun mrb_yield_argv(mrb : MrbState*, b : Int32, argc : Int16, argv : Void*) : Int32
-  fun mrb_gc_protect(mrb : MrbState*, obj : Int32) : Void
-  fun mrb_to_int(mrb : MrbState*, val : Int32) : Int32
-  fun mrb_check_type(mrb : MrbState*, x : Int32, t : Int32) : Void
-  fun mrb_define_alias(mrb : MrbState*, klass : RClass*, name1 : UInt8*, name2 : UInt8*) : Void
-  fun mrb_class_name(mrb : MrbState*, klass : RClass*) : UInt8*
-  fun mrb_define_global_const(mrb : MrbState*, name : UInt8*, val : Int32) : Void
-  fun mrb_block_proc() : Int32
-  fun mrb_attr_get(mrb : MrbState*, obj : Int32, id : Int16) : Int32
-  fun mrb_respond_to(mrb : MrbState*, obj : Int32, mid : Int16) : UInt8
-  fun mrb_obj_is_instance_of(mrb : MrbState*, obj : Int32, c : RClass*) : UInt8
-  fun mrb_pool_open(mrbstate : MrbState*) : MrbPool*
-  fun mrb_pool_close(mrbpool : MrbPool*) : Void
-  fun mrb_pool_alloc(mrbpool : MrbPool*, uint32 : UInt32) : Void*
-  fun mrb_pool_realloc(mrbpool : MrbPool*, void : Void*, oldlen : UInt32, newlen : UInt32) : Void*
-  fun mrb_pool_can_realloc(mrbpool : MrbPool*, void : Void*, uint32 : UInt32) : UInt8
-  fun mrb_alloca(mrb : MrbState*, uint32 : UInt32) : Void*
-  fun mrb_class(mrb : MrbState*, v : Int32) : RClass*
-  fun mrb_define_class_id(mrbstate : MrbState*, int16 : Int16, rclass : RClass*) : RClass*
-  fun mrb_define_module_id(mrbstate : MrbState*, int16 : Int16) : RClass*
-  fun mrb_vm_define_class(mrbstate : MrbState*, int32 : Int32, int32 : Int32, int16 : Int16) : RClass*
-  fun mrb_vm_define_module(mrbstate : MrbState*, int32 : Int32, int16 : Int16) : RClass*
-  fun mrb_define_method_vm(mrbstate : MrbState*, rclass : RClass*, int16 : Int16, int32 : Int32) : Void
-  fun mrb_define_method_raw(mrbstate : MrbState*, rclass : RClass*, int16 : Int16, rproc : RProc*) : Void
-  fun mrb_define_method_id(mrb : MrbState*, c : RClass*, mid : Int16, func : Void*, aspec : UInt16) : Void
-  fun mrb_alias_method(mrb : MrbState*, c : RClass*, a : Int16, b : Int16) : Void
-  fun mrb_class_outer_module(mrbstate : MrbState*, rclass : RClass*) : RClass*
-  fun mrb_method_search_vm(mrbstate : MrbState*, rclass : RClass**, int16 : Int16) : RProc*
-  fun mrb_method_search(mrbstate : MrbState*, rclass : RClass*, int16 : Int16) : RProc*
-  fun mrb_class_real(cl : RClass*) : RClass*
-  fun mrb_gc_mark_mt(mrbstate : MrbState*, rclass : RClass*) : Void
-  fun mrb_gc_mark_mt_size(mrbstate : MrbState*, rclass : RClass*) : UInt32
-  fun mrb_gc_free_mt(mrbstate : MrbState*, rclass : RClass*) : Void
-  fun mrbc_context_new(mrb : MrbState*) : MrbcContext*
-  fun mrbc_context_free(mrb : MrbState*, cxt : MrbcContext*) : Void
-  fun mrbc_filename(mrb : MrbState*, c : MrbcContext*, s : UInt8*) : UInt8*
-  fun mrbc_partial_hook(mrb : MrbState*, c : MrbcContext*, partial_hook : Void*, data : Void*) : Void
-  fun mrb_parser_new(mrbstate : MrbState*) : MrbParserState*
-  fun mrb_parser_free(mrbparserstate : MrbParserState*) : Void
-  fun mrb_parser_parse(mrbparserstate : MrbParserState*, mrbccontext : MrbcContext*) : Void
-  fun mrb_parser_set_filename(mrbparserstate : MrbParserState*, uint8 : UInt8*) : Void
-  fun mrb_parser_get_filename(mrbparserstate : MrbParserState*, idx : UInt16) : UInt8*
-  fun mrb_parse_file(mrbstate : MrbState*, void : Void*, mrbccontext : MrbcContext*) : MrbParserState*
-  fun mrb_parse_string(mrbstate : MrbState*, uint8 : UInt8*, mrbccontext : MrbcContext*) : MrbParserState*
-  fun mrb_parse_nstring(mrbstate : MrbState*, uint8 : UInt8*, int16 : Int16, mrbccontext : MrbcContext*) : MrbParserState*
-  fun mrb_generate_code(mrbstate : MrbState*, mrbparserstate : MrbParserState*) : RProc*
-  fun mrb_load_file(mrbstate : MrbState*, void : Void*) : Int32
-  fun mrb_load_string(mrb : MrbState*, s : UInt8*) : Int32
-  fun mrb_load_nstring(mrb : MrbState*, s : UInt8*, len : Int16) : Int32
-  fun mrb_load_file_cxt(mrbstate : MrbState*, void : Void*, cxt : MrbcContext*) : Int32
-  fun mrb_load_string_cxt(mrb : MrbState*, s : UInt8*, cxt : MrbcContext*) : Int32
-  fun mrb_load_nstring_cxt(mrb : MrbState*, s : UInt8*, len : Int16, cxt : MrbcContext*) : Int32
+  fun allocf = "mrb_allocf"(void : Void*, uint32 : UInt32, ud : Void*) : State*
+  fun func_t = "mrb_func_t"(state : State*, int32 : Int32) : Int32
+  fun define_class = "mrb_define_class"(state : State*, uint8 : UInt8*, rclass : RClass*) : RClass*
+  fun define_module = "mrb_define_module"(state : State*, uint8 : UInt8*) : RClass*
+  fun singleton_class = "mrb_singleton_class"(state : State*, int32 : Int32) : Int32
+  fun include_module = "mrb_include_module"(state : State*, rclass : RClass*, rclass : RClass*) : Void
+  fun define_method = "mrb_define_method"(state : State*, rclass : RClass*, uint8 : UInt8*, void : Void*, uint16 : UInt16) : Void
+  fun define_class_method = "mrb_define_class_method"(state : State*, rclass : RClass*, uint8 : UInt8*, void : Void*, uint16 : UInt16) : Void
+  fun define_singleton_method = "mrb_define_singleton_method"(state : State*, void : Void*, uint8 : UInt8*, void : Void*, uint16 : UInt16) : Void
+  fun define_module_function = "mrb_define_module_function"(state : State*, rclass : RClass*, uint8 : UInt8*, void : Void*, uint16 : UInt16) : Void
+  fun define_const = "mrb_define_const"(state : State*, rclass : RClass*, name : UInt8*, int32 : Int32) : Void
+  fun undef_method = "mrb_undef_method"(state : State*, rclass : RClass*, uint8 : UInt8*) : Void
+  fun undef_class_method = "mrb_undef_class_method"(state : State*, rclass : RClass*, uint8 : UInt8*) : Void
+  fun obj_new = "mrb_obj_new"(state : State*, c : RClass*, argc : Int16, argv : Void*) : Int32
+  fun instance_new = "mrb_instance_new"(state : State*, cv : Int32) : Int32
+  fun class_new = "mrb_class_new"(state : State*, super_ : RClass*) : RClass*
+  fun module_new = "mrb_module_new"(state : State*) : RClass*
+  fun class_defined = "mrb_class_defined"(state : State*, name : UInt8*) : UInt8
+  fun class_get = "mrb_class_get"(state : State*, name : UInt8*) : RClass*
+  fun class_get_under = "mrb_class_get_under"(state : State*, outer : RClass*, name : UInt8*) : RClass*
+  fun obj_dup = "mrb_obj_dup"(state : State*, obj : Int32) : Int32
+  fun check_to_integer = "mrb_check_to_integer"(state : State*, val : Int32, method : UInt8*) : Int32
+  fun obj_respond_to = "mrb_obj_respond_to"(state : State*, c : RClass*, mid : Int16) : UInt8
+  fun define_class_under = "mrb_define_class_under"(state : State*, outer : RClass*, name : UInt8*, super_ : RClass*) : RClass*
+  fun define_module_under = "mrb_define_module_under"(state : State*, outer : RClass*, name : UInt8*) : RClass*
+  fun get_args = "mrb_get_args"(state : State*, format : UInt8*) : Int16
+  fun funcall = "mrb_funcall"(state : State*, int32 : Int32, uint8 : UInt8*, int16 : Int16) : Int32
+  fun funcall_argv = "mrb_funcall_argv"(state : State*, int32 : Int32, int16 : Int16, int16 : Int16, void : Void*) : Int32
+  fun funcall_with_block = "mrb_funcall_with_block"(state : State*, int32 : Int32, int16 : Int16, int16 : Int16, void : Void*, int32 : Int32) : Int32
+  fun intern_cstr = "mrb_intern_cstr"(state : State*, uint8 : UInt8*) : Int16
+  fun intern = "mrb_intern"(state : State*, uint8 : UInt8*, uint32 : UInt32) : Int16
+  fun intern_static = "mrb_intern_static"(state : State*, uint8 : UInt8*, uint32 : UInt32) : Int16
+  fun intern_str = "mrb_intern_str"(state : State*, int32 : Int32) : Int16
+  fun check_intern_cstr = "mrb_check_intern_cstr"(state : State*, uint8 : UInt8*) : Int32
+  fun check_intern = "mrb_check_intern"(state : State*, uint8 : UInt8*, uint32 : UInt32) : Int32
+  fun check_intern_str = "mrb_check_intern_str"(state : State*, int32 : Int32) : Int32
+  fun sym2name = "mrb_sym2name"(state : State*, int16 : Int16) : UInt8*
+  fun sym2name_len = "mrb_sym2name_len"(state : State*, int16 : Int16, void : Void*) : UInt8*
+  fun sym2str = "mrb_sym2str"(state : State*, int16 : Int16) : Int32
+  fun str_format = "mrb_str_format"(state : State*, int16 : Int16, void : Void*, int32 : Int32) : Int32
+  fun malloc = "mrb_malloc"(state : State*, uint32 : UInt32) : Void*
+  fun calloc = "mrb_calloc"(state : State*, uint32 : UInt32, uint32 : UInt32) : Void*
+  fun realloc = "mrb_realloc"(state : State*, void : Void*, uint32 : UInt32) : Void*
+  fun realloc_simple = "mrb_realloc_simple"(state : State*, void : Void*, uint32 : UInt32) : Void*
+  fun malloc_simple = "mrb_malloc_simple"(state : State*, uint32 : UInt32) : Void*
+  fun obj_alloc = "mrb_obj_alloc"(state : State*, int32 : Int32, rclass : RClass*) : Void*
+  fun free = "mrb_free"(state : State*, void : Void*) : Void
+  fun str_new = "mrb_str_new"(state : State*, p : UInt8*, len : UInt32) : Int32
+  fun str_new_cstr = "mrb_str_new_cstr"(state : State*, uint8 : UInt8*) : Int32
+  fun str_new_static = "mrb_str_new_static"(state : State*, p : UInt8*, len : UInt32) : Int32
+  fun open = "mrb_open"() : State*
+  fun open_allocf = "mrb_open_allocf"(void : Void*, ud : Void*) : State*
+  fun close = "mrb_close"(state : State*) : Void
+  fun top_self = "mrb_top_self"(state : State*) : Int32
+  fun run = "mrb_run"(state : State*, rproc : RProc*, int32 : Int32) : Int32
+  fun context_run = "mrb_context_run"(state : State*, rproc : RProc*, int32 : Int32, uint16 : UInt16) : Int32
+  fun p = "mrb_p"(state : State*, int32 : Int32) : Void
+  fun obj_id = "mrb_obj_id"(obj : Int32) : Int16
+  fun obj_to_sym = "mrb_obj_to_sym"(state : State*, name : Int32) : Int16
+  fun obj_eq = "mrb_obj_eq"(state : State*, int32 : Int32, int32 : Int32) : UInt8
+  fun obj_equal = "mrb_obj_equal"(state : State*, int32 : Int32, int32 : Int32) : UInt8
+  fun equal = "mrb_equal"(state : State*, obj1 : Int32, obj2 : Int32) : UInt8
+  fun integer = "mrb_Integer"(state : State*, val : Int32) : Int32
+  fun float = "mrb_Float"(state : State*, val : Int32) : Int32
+  fun inspect = "mrb_inspect"(state : State*, obj : Int32) : Int32
+  fun eql = "mrb_eql"(state : State*, obj1 : Int32, obj2 : Int32) : UInt8
+  fun garbage_collect = "mrb_garbage_collect"(state : State*) : Void
+  fun full_gc = "mrb_full_gc"(state : State*) : Void
+  fun incremental_gc = "mrb_incremental_gc"(state : State*) : Void
+  fun gc_arena_save = "mrb_gc_arena_save"(state : State*) : Int16
+  fun gc_arena_restore = "mrb_gc_arena_restore"(state : State*, int16 : Int16) : Void
+  fun gc_mark = "mrb_gc_mark"(state : State*, void : Void*) : Void
+  fun field_write_barrier = "mrb_field_write_barrier"(state : State*, void : Void*, void : Void*) : Void
+  fun write_barrier = "mrb_write_barrier"(state : State*, void : Void*) : Void
+  fun check_convert_type = "mrb_check_convert_type"(state : State*, val : Int32, type : Int32, tname : UInt8*, method : UInt8*) : Int32
+  fun any_to_s = "mrb_any_to_s"(state : State*, obj : Int32) : Int32
+  fun obj_classname = "mrb_obj_classname"(state : State*, obj : Int32) : UInt8*
+  fun obj_class = "mrb_obj_class"(state : State*, obj : Int32) : RClass*
+  fun class_path = "mrb_class_path"(state : State*, c : RClass*) : Int32
+  fun convert_type = "mrb_convert_type"(state : State*, val : Int32, type : Int32, tname : UInt8*, method : UInt8*) : Int32
+  fun obj_is_kind_of = "mrb_obj_is_kind_of"(state : State*, obj : Int32, c : RClass*) : UInt8
+  fun obj_inspect = "mrb_obj_inspect"(state : State*, self_ : Int32) : Int32
+  fun obj_clone = "mrb_obj_clone"(state : State*, self_ : Int32) : Int32
+  fun exc_new = "mrb_exc_new"(state : State*, c : RClass*, ptr : UInt8*, len : Int32) : Int32
+  fun exc_raise = "mrb_exc_raise"(state : State*, exc : Int32) : Void
+  fun raise = "mrb_raise"(state : State*, c : RClass*, msg : UInt8*) : Void
+  fun raisef = "mrb_raisef"(state : State*, c : RClass*, fmt : UInt8*) : Void
+  fun name_error = "mrb_name_error"(state : State*, id : Int16, fmt : UInt8*) : Void
+  fun warn = "mrb_warn"(state : State*, fmt : UInt8*) : Void
+  fun bug = "mrb_bug"(state : State*, fmt : UInt8*) : Void
+  fun print_backtrace = "mrb_print_backtrace"(state : State*) : Void
+  fun print_error = "mrb_print_error"(state : State*) : Void
+  fun yield_ = "mrb_yield"(state : State*, b : Int32, arg : Int32) : Int32
+  fun yield_argv = "mrb_yield_argv"(state : State*, b : Int32, argc : Int16, argv : Void*) : Int32
+  fun gc_protect = "mrb_gc_protect"(state : State*, obj : Int32) : Void
+  fun to_int = "mrb_to_int"(state : State*, val : Int32) : Int32
+  fun check_type = "mrb_check_type"(state : State*, x : Int32, t : Int32) : Void
+  fun define_alias = "mrb_define_alias"(state : State*, klass : RClass*, name1 : UInt8*, name2 : UInt8*) : Void
+  fun class_name = "mrb_class_name"(state : State*, klass : RClass*) : UInt8*
+  fun define_global_const = "mrb_define_global_const"(state : State*, name : UInt8*, val : Int32) : Void
+  fun block_proc = "mrb_block_proc"() : Int32
+  fun attr_get = "mrb_attr_get"(state : State*, obj : Int32, id : Int16) : Int32
+  fun respond_to = "mrb_respond_to"(state : State*, obj : Int32, mid : Int16) : UInt8
+  fun obj_is_instance_of = "mrb_obj_is_instance_of"(state : State*, obj : Int32, c : RClass*) : UInt8
+  fun pool_open = "mrb_pool_open"(state : State*) : Pool*
+  fun pool_close = "mrb_pool_close"(pool : Pool*) : Void
+  fun pool_alloc = "mrb_pool_alloc"(pool : Pool*, uint32 : UInt32) : Void*
+  fun pool_realloc = "mrb_pool_realloc"(pool : Pool*, void : Void*, oldlen : UInt32, newlen : UInt32) : Void*
+  fun pool_can_realloc = "mrb_pool_can_realloc"(pool : Pool*, void : Void*, uint32 : UInt32) : UInt8
+  fun alloca = "mrb_alloca"(state : State*, uint32 : UInt32) : Void*
+  fun class_ = "mrb_class"(state : State*, v : Int32) : RClass*
+  fun define_class_id = "mrb_define_class_id"(state : State*, int16 : Int16, rclass : RClass*) : RClass*
+  fun define_module_id = "mrb_define_module_id"(state : State*, int16 : Int16) : RClass*
+  fun vm_define_class = "mrb_vm_define_class"(state : State*, int32 : Int32, int32 : Int32, int16 : Int16) : RClass*
+  fun vm_define_module = "mrb_vm_define_module"(state : State*, int32 : Int32, int16 : Int16) : RClass*
+  fun define_method_vm = "mrb_define_method_vm"(state : State*, rclass : RClass*, int16 : Int16, int32 : Int32) : Void
+  fun define_method_raw = "mrb_define_method_raw"(state : State*, rclass : RClass*, int16 : Int16, rproc : RProc*) : Void
+  fun define_method_id = "mrb_define_method_id"(state : State*, c : RClass*, mid : Int16, func : Void*, aspec : UInt16) : Void
+  fun alias_method = "mrb_alias_method"(state : State*, c : RClass*, a : Int16, b : Int16) : Void
+  fun class_outer_module = "mrb_class_outer_module"(state : State*, rclass : RClass*) : RClass*
+  fun method_search_vm = "mrb_method_search_vm"(state : State*, rclass : RClass**, int16 : Int16) : RProc*
+  fun method_search = "mrb_method_search"(state : State*, rclass : RClass*, int16 : Int16) : RProc*
+  fun class_real = "mrb_class_real"(cl : RClass*) : RClass*
+  fun gc_mark_mt = "mrb_gc_mark_mt"(state : State*, rclass : RClass*) : Void
+  fun gc_mark_mt_size = "mrb_gc_mark_mt_size"(state : State*, rclass : RClass*) : UInt32
+  fun gc_free_mt = "mrb_gc_free_mt"(state : State*, rclass : RClass*) : Void
+  fun c_context_new = "mrbc_context_new"(state : State*) : CContext*
+  fun c_context_free = "mrbc_context_free"(state : State*, cxt : CContext*) : Void
+  fun c_filename = "mrbc_filename"(state : State*, c : CContext*, s : UInt8*) : UInt8*
+  fun c_partial_hook = "mrbc_partial_hook"(state : State*, c : CContext*, partial_hook : Void*, data : Void*) : Void
+  fun parser_new = "mrb_parser_new"(state : State*) : ParserState*
+  fun parser_free = "mrb_parser_free"(parserstate : ParserState*) : Void
+  fun parser_parse = "mrb_parser_parse"(parserstate : ParserState*, ccontext : CContext*) : Void
+  fun parser_set_filename = "mrb_parser_set_filename"(parserstate : ParserState*, uint8 : UInt8*) : Void
+  fun parser_get_filename = "mrb_parser_get_filename"(parserstate : ParserState*, idx : UInt16) : UInt8*
+  fun parse_file = "mrb_parse_file"(state : State*, void : Void*, ccontext : CContext*) : ParserState*
+  fun parse_string = "mrb_parse_string"(state : State*, uint8 : UInt8*, ccontext : CContext*) : ParserState*
+  fun parse_nstring = "mrb_parse_nstring"(state : State*, uint8 : UInt8*, int16 : Int16, ccontext : CContext*) : ParserState*
+  fun generate_code = "mrb_generate_code"(state : State*, parserstate : ParserState*) : RProc*
+  fun load_file = "mrb_load_file"(state : State*, void : Void*) : Int32
+  fun load_string = "mrb_load_string"(state : State*, s : UInt8*) : Int32
+  fun load_nstring = "mrb_load_nstring"(state : State*, s : UInt8*, len : Int16) : Int32
+  fun load_file_cxt = "mrb_load_file_cxt"(state : State*, void : Void*, cxt : CContext*) : Int32
+  fun load_string_cxt = "mrb_load_string_cxt"(state : State*, s : UInt8*, cxt : CContext*) : Int32
+  fun load_nstring_cxt = "mrb_load_nstring_cxt"(state : State*, s : UInt8*, len : Int16, cxt : CContext*) : Int32
 end
