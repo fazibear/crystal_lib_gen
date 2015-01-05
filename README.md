@@ -6,11 +6,14 @@ Automatic binding generator for Crystal
 ## Install (OSX)
 
 ```
+brew install llvm --with-clang
+brew link llvm --force
 brew install crystal
-brew install llvm --with-clang --with-shared
 brew install mruby
+
 bundle install
-./run.sh examples/mruby.rb
+
+bin/crystal_lib_gen examples/mruby.rb
 crystal out/test_mruby.cr
 ```
 

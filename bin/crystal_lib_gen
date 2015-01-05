@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+
+unless ARGV[0]
+  puts "Error: unknown lib_spec"
+  puts
+  puts "Usage: crystal_lib_gen lib_spec.rb"
+  puts
+  puts "Example: crystal_lib_gen example/mruby.rb"
+  puts
+  exit
+end
+
+begin
+  require 'bundler/setup'
+  Bundler.require(:default)
+  require_relative '../lib/crystal_lib_gen'
+rescue LoadError => e
+  puts "Error: install llvm with clang support" 
+  puts
+  puts "Example:"
+  puts "brew install llvm --with-clang"
+  puts "brew link --force"
+  puts
+  exit
+end
+
+eval File.open(ARGV[0]).read

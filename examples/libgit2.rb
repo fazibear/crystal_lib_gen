@@ -1,10 +1,3 @@
-#set -x DYLD_FALLBACK_LIBRARY_PATH /usr/local/opt/llvm/lib/
-
-require 'bundler/setup'
-Bundler.require(:default)
-
-require_relative '../lib/crystal_lib_gen'
-
 FFIGen.generate(
   module_name: "Git2",
   ffi_lib:     "libgit2",
