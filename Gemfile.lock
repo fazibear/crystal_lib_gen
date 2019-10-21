@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    ffi (1.9.6)
+    ffi (1.11.1)
     ffi_gen (1.1.0)
       ffi (>= 1.0.0)
 
